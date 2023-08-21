@@ -7,7 +7,6 @@ namespace Chinook.Core.Infrastructure.Repositories
         int Count();
         TEntity Get(int id);
         TEntity Get(Expression<Func<TEntity, bool>> predicate = null);
-        Task<TEntity> GetAsync(int id);
 
         IList<TEntity> GetAll();
         IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate = null);

@@ -19,7 +19,7 @@ namespace Chinook.Configuration.Middlewares
             }
             catch (Exception ex)
             {
-                await context.Response.WriteAsync(ex.Message + " - An error occurred. Please try again later.");
+                await context.Response.WriteAsync(ex.Message + " - Exception occure please try again later.");
             }
         }
     }

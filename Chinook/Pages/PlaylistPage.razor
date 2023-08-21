@@ -13,24 +13,15 @@
 
 <h1>Playlist <strong>@Playlist.Name</strong></h1>
 
-@if (!string.IsNullOrWhiteSpace(InfoMessage))
+@if (!string.IsNullOrWhiteSpace(InfoMessage) || !string.IsNullOrWhiteSpace(ErrorMessage))
 {
+    var alertColor = !string.IsNullOrWhiteSpace(InfoMessage) ? "info" : "danger";
+    var message = !string.IsNullOrWhiteSpace(InfoMessage) ? InfoMessage : ErrorMessage;
+
     <div class="alert alert-info fade show">
         <div class="d-flex align-items-start">
             <div class="flex-grow-1">
-                @InfoMessage
-            </div>
-            <button type="button" class="btn-close" aria-label="Close" @onclick="CloseInfoMessage"></button>
-        </div>
-    </div>
-}
-
-@if (!string.IsNullOrWhiteSpace(ErrorMessage))
-{
-    <div class="alert alert-danger fade show">
-        <div class="d-flex align-items-start">
-            <div class="flex-grow-1">
-                @ErrorMessage
+                @message
             </div>
             <button type="button" class="btn-close" aria-label="Close" @onclick="CloseInfoMessage"></button>
         </div>
@@ -85,7 +76,6 @@ else
     private ClientModels.Playlist Playlist;
     private string InfoMessage;
     private string ErrorMessage;
-    private ChinookContext _context;
     private string CurrentUserId;
 
     protected override async Task OnInitializedAsync()

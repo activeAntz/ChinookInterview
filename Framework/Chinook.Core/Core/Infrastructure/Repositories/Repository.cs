@@ -46,11 +46,6 @@ namespace Chinook.Core.Infrastructure.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<TEntity> GetAsync(int id)
-        {
-            return await _dbSet.FindAsync(id);
-        }
-
         public void Remove(TEntity entity)
         {
             _dbSet.Remove(entity);

@@ -12,24 +12,15 @@
 @inject IPlayListService playListService;
 @inject IArtistService artistService;
 
-@if (!string.IsNullOrWhiteSpace(InfoMessage))
+@if (!string.IsNullOrWhiteSpace(InfoMessage) || !string.IsNullOrWhiteSpace(ErrorMessage))
 {
-    <div class="alert alert-info fade show">
-        <div class="d-flex align-items-start">
-            <div class="flex-grow-1">
-                @InfoMessage
-            </div>
-            <button type="button" class="btn-close" aria-label="Close" @onclick="CloseInfoMessage"></button>
-        </div>
-    </div>
-}
+    var alertColor = !string.IsNullOrWhiteSpace(InfoMessage) ? "info" : "danger";
+    var message = !string.IsNullOrWhiteSpace(InfoMessage) ? InfoMessage : ErrorMessage;
 
-@if (!string.IsNullOrWhiteSpace(ErrorMessage))
-{
-    <div class="alert alert-danger fade show">
+    <div class="alert alert-@alertColor fade show">
         <div class="d-flex align-items-start">
             <div class="flex-grow-1">
-                @ErrorMessage
+                @message
             </div>
             <button type="button" class="btn-close" aria-label="Close" @onclick="CloseInfoMessage"></button>
         </div>

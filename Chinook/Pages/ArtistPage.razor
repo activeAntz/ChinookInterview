@@ -142,8 +142,10 @@ else
 
         if (existPlayList != null) state = trackService.AddExistPlayList(SelectedTrack.TrackId, CurrentUserId, existPlayList);
 
-        if (!string.IsNullOrEmpty(newPlayList))
-             state = playListService.AddNewPlaylist(newPlayList, CurrentUserId);
+        if (!string.IsNullOrEmpty(newPlayList)){
+            var newPlayListId = playListService.AddNewPlaylist(newPlayList, CurrentUserId);
+            state = trackService.AddExistPlayList(SelectedTrack.TrackId, CurrentUserId, newPlayListId);
+        }
 
         if (state == 1) InfoMessage = $"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} added to playlist {newPlayList}.";
         else ErrorMessage = $"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} can not added to playlist {newPlayList}.";

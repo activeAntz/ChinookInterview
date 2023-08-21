@@ -15,7 +15,7 @@ namespace Chinook.Services
             _unitOfWork = unitOfWork;
         }
 
-        public int AddNewPlaylist(string newPlayListName, string CurrentUserId)
+        public long AddNewPlaylist(string newPlayListName, string CurrentUserId)
         {
             var playListCount = _unitOfWork.Playlists.Count();
             var newPlayList = _unitOfWork.Playlists.IncludeTracks(c => c.Name == newPlayListName && c.UserPlaylists.Any(x => x.UserId == CurrentUserId));
@@ -29,7 +29,8 @@ namespace Chinook.Services
             var dataList = new UserPlaylist { UserId = CurrentUserId, Playlist = newPlayList };
 
             _unitOfWork.UserPlaylists.Add(dataList);
-            return _unitOfWork.Save();
+             _unitOfWork.Save();
+            return newPlayList.PlaylistId;
         }
 
         public async Task<List<ClientModels.Playlists>> GetFilterPlaylistsAsync(long trackId, string CurrentUserId)

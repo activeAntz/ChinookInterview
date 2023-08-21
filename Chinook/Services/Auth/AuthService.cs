@@ -6,18 +6,21 @@ namespace Chinook.Services.Auth
 {
     public class AuthService : IAuthService
     {
-        private readonly AuthenticationState authenticationState;
+        private readonly AuthenticationStateProvider AuthenticationStateProvider;
 
-        public AuthService(AuthenticationState authenticationState)
+        public string CurrentUserId { get; set; }
+
+        public AuthService(AuthenticationStateProvider AuthenticationStateProvider)
         {
-            this.authenticationState = authenticationState;
+            this.AuthenticationStateProvider = AuthenticationStateProvider;
+            CurrentUserId = GetUserId().Result;
         }
 
-        public async Task<string> GetUserId()
+        private async Task<string> GetUserId()
         {
-            var user = (await authenticationState).User;
-            var userId = user.FindFirst(u => u.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
-            return userId;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            return user.FindFirst(u => u.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
         }
     }
 }

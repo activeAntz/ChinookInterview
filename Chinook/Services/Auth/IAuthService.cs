@@ -2,6 +2,6 @@
 {
     public interface IAuthService
     {
-        Task<string> GetUserId();
+        string CurrentUserId { get; set; }
     }
 }

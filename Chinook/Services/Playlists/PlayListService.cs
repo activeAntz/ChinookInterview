@@ -1,20 +1,25 @@
 ﻿using Chinook.Core.Helper;
 using Chinook.Core.Uow;
 using Chinook.Core.Data.Models;
+using Chinook.Utilities.Validation;
+using Chinook.Services.Auth;
 
 namespace Chinook.Services
 {
     public class PlayListService : IPlayListService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuthService _auth;
 
-        public PlayListService(IUnitOfWork unitOfWork)
+        public PlayListService(IUnitOfWork unitOfWork, IAuthService auth)
         {
             _unitOfWork = unitOfWork;
+            _auth = auth;
         }
 
         public (bool,long) AddNewPlaylist(string newPlayListName, string CurrentUserId)
         {
+            var user = _auth.CurrentUserId;
             var playListCount = _unitOfWork.Playlists.Count();
             var newPlayList = _unitOfWork.Playlists.IncludeTracks(c => c.Name == newPlayListName && c.UserPlaylists.Any(x => x.UserId == CurrentUserId));
 
@@ -49,6 +54,8 @@ namespace Chinook.Services
 
         public async Task<ClientModels.Playlist> GetPlaylistAsync(long PlaylistId, string CurrentUserId)
         {
+            Guard.ThrowIfNull(PlaylistId);
+
             var playlists = await _unitOfWork.Playlists.ThenIncludeTracks(p => p.PlaylistId == PlaylistId && p.UserPlaylists.Any(c => c.UserId == CurrentUserId));
             var data = new ClientModels.Playlist
             {

@@ -18,13 +18,9 @@ namespace Chinook.Core.Uow
         }
 
         public IArtistProvider Artists { get { return new ArtistProvider(this._context); } }
-
         public IPlaylistProvider Playlists { get { return new PlaylistProvider(this._context); } }
-
         public ITrackProvider Tracks { get { return new TrackProvider(this._context); } }
-
         public IUserPlaylistProvider UserPlaylists { get { return new UserPlaylistProvider(this._context); } }
-
 
         public int Save() => _context.SaveChanges();
 
@@ -33,21 +29,5 @@ namespace Chinook.Core.Uow
             _context.Dispose();
             GC.SuppressFinalize(this);
         }
-
-        //public int CommitWithSave()
-        //{
-        //    try
-        //    {
-        //        var isSave = Save();
-        //        _transaction.Commit();
-        //        return isSave;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        _transaction.Rollback();
-        //        return 0;
-        //    }
-        //    finally { _transaction.Dispose(); }
-        //}
     }
 }

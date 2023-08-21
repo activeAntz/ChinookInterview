@@ -12,6 +12,5 @@ namespace Chinook.Core.Uow
         ITrackProvider Tracks { get; }
         IUserPlaylistProvider UserPlaylists { get; }
         int Save();
-        //int CommitWithSave();
     }
 }

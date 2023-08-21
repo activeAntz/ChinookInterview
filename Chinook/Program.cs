@@ -1,6 +1,9 @@
-using Chinook;
 using Chinook.Areas.Identity;
-using Chinook.Models;
+using Chinook.Configuration.Middlewares;
+using Chinook.Core.Data;
+using Chinook.Core.Uow;
+using Chinook.Core.Data.Models;
+using Chinook.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +20,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ChinookUser>>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ITrackService, TrackService>();
+builder.Services.AddScoped<IPlayListService, PlayListService>();
+builder.Services.AddScoped<IArtistService, ArtistService>();
 
 var app = builder.Build();
 
@@ -32,6 +39,7 @@ else
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
@@ -44,5 +52,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+app.UseExceptionHandlingMiddleware();
 
 app.Run();

@@ -5,5 +5,6 @@ namespace Chinook.Core.Business.Artists
 {
     public interface IArtistProvider : IRepository<Artist>
     {
+        Task<List<Artist>> GetArtistsAsync();
     }
 }

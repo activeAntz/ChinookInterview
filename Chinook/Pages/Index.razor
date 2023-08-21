@@ -39,21 +39,21 @@ else
 }
 
 @code {
-    private IList<Artist> Artists;
+    private List<Artist> Artists;
 
     protected override async Task OnInitializedAsync() {
         await InvokeAsync(StateHasChanged);
-        GetArtists();
+        await GetArtists();
     }
 
-    public void GetArtists()
+    public async Task GetArtists()
     {
-        Artists = artistService.GetArtists();
+        Artists = await artistService.GetArtistsAsync();
     }
 
-    public void SearchArtistByName(string artistName)
+    public async void SearchArtistByName(string artistName)
     {
-        GetArtists();
+        await GetArtists();
         if (!string.IsNullOrEmpty(artistName))
             Artists = Artists.Where(c => c.Name.Contains(artistName)).ToList();
     }

@@ -4,7 +4,7 @@ namespace Chinook.Services
 {
     public interface IArtistService
     {
-        IList<Artist> GetArtists();
+        Task<List<Artist>> GetArtistsAsync();
         Artist GetArtist(long artistId);
     }
 }

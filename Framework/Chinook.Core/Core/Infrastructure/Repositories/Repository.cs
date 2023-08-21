@@ -26,11 +26,6 @@ namespace Chinook.Core.Infrastructure.Repositories
             return _dbSet.FirstOrDefault(predicate);
         }
 
-        public IList<TEntity> GetAll()
-        {
-            return _dbSet.ToList();
-        }
-
         public IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate = null)
         {
             return _dbSet.Where(predicate).ToList();

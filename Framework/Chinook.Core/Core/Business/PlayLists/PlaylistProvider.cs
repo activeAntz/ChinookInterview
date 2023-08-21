@@ -10,6 +10,12 @@ namespace Chinook.Core.Business.PlayLists
     {
         public PlaylistProvider(DbContext context) : base(context) { }
 
+        public List<Playlist> GetPlaylistsByUserId(Expression<Func<Playlist, bool>> predicate)
+        {
+            return _dbSet.Where(predicate)
+                    .Include(a => a.Tracks).ThenInclude(a => a.Album).ThenInclude(a => a.Artist).ToList();
+        }
+
         public Playlist? IncludeTracks(Expression<Func<Playlist, bool>> predicate)
         {
             return _dbSet.Include(c => c.Tracks).FirstOrDefault(predicate);

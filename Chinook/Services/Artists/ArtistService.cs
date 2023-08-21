@@ -17,9 +17,9 @@ namespace Chinook.Services
             return _unitOfWork.Artists.Get(c => c.ArtistId == artistId);
         }
 
-        public IList<Artist> GetArtists()
+        public async Task<List<Artist>> GetArtistsAsync()
         {
-            return _unitOfWork.Artists.GetAll();
+            return await _unitOfWork.Artists.GetArtistsAsync();
         }
     }
 }

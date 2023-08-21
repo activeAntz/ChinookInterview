@@ -1,8 +1,6 @@
 ﻿using Chinook.Core.Helper;
 using Chinook.Core.Uow;
 using Chinook.Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
-using NuGet.DependencyResolver;
 
 namespace Chinook.Services
 {
@@ -15,10 +13,13 @@ namespace Chinook.Services
             _unitOfWork = unitOfWork;
         }
 
-        public long AddNewPlaylist(string newPlayListName, string CurrentUserId)
+        public (bool,long) AddNewPlaylist(string newPlayListName, string CurrentUserId)
         {
             var playListCount = _unitOfWork.Playlists.Count();
             var newPlayList = _unitOfWork.Playlists.IncludeTracks(c => c.Name == newPlayListName && c.UserPlaylists.Any(x => x.UserId == CurrentUserId));
+
+            if (newPlayList != null)
+                return (false, newPlayList.PlaylistId);
 
             newPlayList = new Playlist
             {
@@ -29,8 +30,10 @@ namespace Chinook.Services
             var dataList = new UserPlaylist { UserId = CurrentUserId, Playlist = newPlayList };
 
             _unitOfWork.UserPlaylists.Add(dataList);
-             _unitOfWork.Save();
-            return newPlayList.PlaylistId;
+            if(_unitOfWork.Save() > 0)
+                return (true, newPlayList.PlaylistId);
+
+            return (false, newPlayList.PlaylistId);
         }
 
         public async Task<List<ClientModels.Playlists>> GetFilterPlaylistsAsync(long trackId, string CurrentUserId)
@@ -49,11 +52,11 @@ namespace Chinook.Services
             var playlists = await _unitOfWork.Playlists.ThenIncludeTracks(p => p.PlaylistId == PlaylistId && p.UserPlaylists.Any(c => c.UserId == CurrentUserId));
             var data = new ClientModels.Playlist
             {
-                Name = playlists.Name,
+                Name = playlists?.Name ?? string.Empty,
                 Tracks = playlists.Tracks.Select(t => new ClientModels.PlaylistTrack()
                 {
-                    AlbumTitle = t.Album.Title,
-                    ArtistName = t.Album.Artist.Name,
+                    AlbumTitle = t.Album?.Title ?? string.Empty,
+                    ArtistName = t.Album?.Artist.Name ?? string.Empty,
                     TrackId = t.TrackId,
                     TrackName = t.Name,
                     IsFavorite = t.Playlists.Where(p => p.UserPlaylists != null && p.UserPlaylists.Any(up => up.UserId == CurrentUserId && up.Playlist.Name == FilterType.Favorites)).Any()
@@ -65,14 +68,14 @@ namespace Chinook.Services
 
         public IList<ClientModels.Playlists> GetPlaylistsByUserId(string CurrentUserId)
         {
-            return _unitOfWork.Playlists
-                    .Where(p => p.UserPlaylists.Any(c => c.UserId == CurrentUserId))
-                    .Include(a => a.Tracks).ThenInclude(a => a.Album).ThenInclude(a => a.Artist)
-                    .Select(c => new ClientModels.Playlists
-                    {
-                        playListId = c.PlaylistId,
-                        Name = c.Name
-                    }).ToList();
+            var playlists = _unitOfWork.Playlists
+                    .GetPlaylistsByUserId(p => p.UserPlaylists.Any(c => c.UserId == CurrentUserId));
+
+            return playlists.Select(c => new ClientModels.Playlists
+            {
+                playListId = c.PlaylistId,
+                Name = c.Name
+            }).ToList();
         }
     }
 }

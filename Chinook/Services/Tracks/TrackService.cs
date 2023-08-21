@@ -17,7 +17,7 @@ namespace Chinook.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public IList<PlaylistTrack> GetPlaylistTracks(long ArtistId, string CurrentUserId)
+        public List<PlaylistTrack> GetPlaylistTracksByArtistId(long ArtistId, string CurrentUserId)
         {
             var Artist = _unitOfWork.Artists.Get(a => a.ArtistId == ArtistId);
 

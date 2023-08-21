@@ -13,7 +13,25 @@
         </div>
 
         <article class="content px-4">
-            @Body
+            <ErrorBoundary @ref="@errorBoundary" Context="Exception">
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent>
+                    <div class="alert alert-danger fade show">
+                        <div class="d-flex align-items-start">
+                            <div class="flex-grow-1">
+                                Oops. Something went wrong. Please contact the system administrator
+                            </div>
+                            <button type="button" class="btn-close" aria-label="Close" @onclick="@errorBoundary.Recover"></button>
+                        </div>
+                    </div>
+                </ErrorContent>
+            </ErrorBoundary>
         </article>
     </main>
 </div>
+
+@code {
+    private ErrorBoundary errorBoundary;
+}

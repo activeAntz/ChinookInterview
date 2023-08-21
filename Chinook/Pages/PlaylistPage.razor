@@ -4,29 +4,18 @@
 @using Chinook.Core.Helper;
 @using Chinook.Core.Data.Models;
 @using Chinook.Core.Data
+@using Chinook.Pages.Components
 @using Chinook.Services;
 @using Microsoft.EntityFrameworkCore
 @using System.Security.Claims;
 
 @inject IPlayListService playListService;
 @inject ITrackService trackService;
+@inject IGlobalErrorService globalErrorService;
 
 <h1>Playlist <strong>@Playlist.Name</strong></h1>
 
-@if (!string.IsNullOrWhiteSpace(InfoMessage) || !string.IsNullOrWhiteSpace(ErrorMessage))
-{
-    var alertColor = !string.IsNullOrWhiteSpace(InfoMessage) ? "info" : "danger";
-    var message = !string.IsNullOrWhiteSpace(InfoMessage) ? InfoMessage : ErrorMessage;
-
-    <div class="alert alert-info fade show">
-        <div class="d-flex align-items-start">
-            <div class="flex-grow-1">
-                @message
-            </div>
-            <button type="button" class="btn-close" aria-label="Close" @onclick="CloseInfoMessage"></button>
-        </div>
-    </div>
-}
+<AlertComponent Message="Message" OnClick="CloseInfoMessage" />
 
 @if (Playlist == null)
 {
@@ -67,70 +56,4 @@ else
             }
         </tbody>
     </table>
-}
-
-@code {
-    [Parameter] public long PlaylistId { get; set; }
-    [CascadingParameter] private Task<AuthenticationState> authenticationState { get; set; }
-
-    private ClientModels.Playlist Playlist;
-    private string InfoMessage;
-    private string ErrorMessage;
-    private string CurrentUserId;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await InvokeAsync(StateHasChanged);
-        CurrentUserId = await GetUserId();
-        Playlist = await playListService.GetPlaylistAsync(PlaylistId, CurrentUserId);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await OnInitializedAsync();
-    }
-
-    private async Task<string> GetUserId()
-    {
-        var user = (await authenticationState).User;
-        var userId = user.FindFirst(u => u.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
-        return userId;
-    }
-
-    private void FavoriteTrack(long trackId)
-    {
-        var track = Playlist.Tracks.FirstOrDefault(t => t.TrackId == trackId);
-
-        var state = trackService.AddFavoriteTrack(trackId, CurrentUserId);
-
-        if (state == 1) InfoMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} added to playlist Favorites.";
-        else ErrorMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not added to playlist Favorites.";
-    }
-
-    private void UnfavoriteTrack(long trackId)
-    {
-        var track = Playlist.Tracks.FirstOrDefault(t => t.TrackId == trackId);
-
-        var (state, name) = trackService.RemoveTrack(trackId, CurrentUserId);
-
-        if (state) InfoMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} removed from playlist {name}.";
-        else ErrorMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not removed from playlist {name}.";
-    }
-
-    private void RemoveTrack(long trackId)
-    {
-        var track = Playlist.Tracks.FirstOrDefault(t => t.TrackId == trackId);
-
-        var (state, name) = trackService.RemoveTrack(trackId, CurrentUserId, PlaylistId);
-
-        if (state) InfoMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} removed from playlist {name}.";
-        else ErrorMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not removed from playlist {name}.";
-    }
-
-    private void CloseInfoMessage()
-    {
-        InfoMessage = "";
-        ErrorMessage = "";
-    }
-
 }

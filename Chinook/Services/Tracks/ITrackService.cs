@@ -4,9 +4,9 @@ namespace Chinook.Services
 {
     public interface ITrackService
     {
-        List<PlaylistTrack> GetPlaylistTracksByArtistId(long ArtistId, string CurrentUserId);
-        int AddFavoriteTrack(long trackId, string CurrentUserId);
-        (bool, string?) RemoveTrack(long trackId, string CurrentUserId, long? PlaylistId = null);
-        int AddExistPlayList(long trackId, string CurrentUserId, long? existPlayList);
+        List<PlaylistTrack> GetPlaylistTracksByArtistId(long ArtistId);
+        int AddFavoriteTrack(long trackId);
+        (bool, string?) RemoveTrack(long trackId, long? PlaylistId = null);
+        int AddExistPlayList(long trackId, long? existPlayList);
     }
 }

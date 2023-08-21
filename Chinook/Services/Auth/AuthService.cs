@@ -8,7 +8,7 @@ namespace Chinook.Services.Auth
     {
         private readonly AuthenticationStateProvider AuthenticationStateProvider;
 
-        public string CurrentUserId { get; set; }
+        public string? CurrentUserId { get; set; }
 
         public AuthService(AuthenticationStateProvider AuthenticationStateProvider)
         {
@@ -16,7 +16,7 @@ namespace Chinook.Services.Auth
             CurrentUserId = GetUserId().Result;
         }
 
-        private async Task<string> GetUserId()
+        private async Task<string?> GetUserId()
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;

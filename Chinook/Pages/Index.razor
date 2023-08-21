@@ -38,23 +38,4 @@ else
     </table>
 }
 
-@code {
-    private List<Artist> Artists;
 
-    protected override async Task OnInitializedAsync() {
-        await InvokeAsync(StateHasChanged);
-        await GetArtists();
-    }
-
-    public async Task GetArtists()
-    {
-        Artists = await artistService.GetArtistsAsync();
-    }
-
-    public async void SearchArtistByName(string artistName)
-    {
-        await GetArtists();
-        if (!string.IsNullOrEmpty(artistName))
-            Artists = Artists.Where(c => c.Name.Contains(artistName)).ToList();
-    }
-}

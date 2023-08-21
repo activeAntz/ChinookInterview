@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Serilog;
+using System.Net;
 
 namespace Chinook.Configuration.Middlewares
 {
@@ -19,7 +21,50 @@ namespace Chinook.Configuration.Middlewares
             }
             catch (Exception ex)
             {
-                await context.Response.WriteAsync(ex.Message + " - Exception occure please try again later.");
+                HttpStatusCode statusCode = HttpStatusCode.InternalServerError;
+
+                if (ex.GetType() == typeof(NotImplementedException))
+                {
+                    statusCode = HttpStatusCode.NotImplemented;
+                }
+                else if (ex.GetType() == typeof(NullReferenceException))
+                {
+                    statusCode = HttpStatusCode.LengthRequired;
+                }
+                else if (ex.GetType() == typeof(OutOfMemoryException))
+                {
+                    statusCode = HttpStatusCode.UnsupportedMediaType;
+                }
+                else if (ex.GetType() == typeof(OverflowException))
+                {
+                    statusCode = HttpStatusCode.RequestEntityTooLarge;
+                }
+                else if (ex.GetType() == typeof(StackOverflowException))
+                {
+                    statusCode = HttpStatusCode.RequestEntityTooLarge;
+                }
+                else if (ex.GetType() == typeof(TypeInitializationException))
+                {
+                    statusCode = HttpStatusCode.NoContent;
+                }
+                else if (ex.GetType() == typeof(BadHttpRequestException))
+                {
+                    statusCode = HttpStatusCode.BadRequest;
+                }
+                else if (ex.GetType() == typeof(UnauthorizedAccessException))
+                {
+                    statusCode = HttpStatusCode.Unauthorized;
+                }
+                else if (ex.GetType() == typeof(InvalidOperationException))
+                {
+                    statusCode = HttpStatusCode.Forbidden;
+                }
+
+                ExceptionProvider exceptionProvider = new ExceptionProvider((int)statusCode, ex.Message);
+
+                context.Response.StatusCode = (int)statusCode;
+                Log.Error(ex, ex.Message);
+                await context.Response.WriteAsync(exceptionProvider.ToString());
             }
         }
     }

@@ -3,25 +3,28 @@ using Chinook.Core.Uow;
 using Chinook.Core.Data.Models;
 using Chinook.Utilities.Validation;
 using Chinook.Services.Auth;
+using NuGet.DependencyResolver;
 
 namespace Chinook.Services
 {
     public class PlayListService : IPlayListService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IAuthService _auth;
+        private readonly string currentUserId;
 
         public PlayListService(IUnitOfWork unitOfWork, IAuthService auth)
         {
             _unitOfWork = unitOfWork;
-            _auth = auth;
+            currentUserId = auth.CurrentUserId;
+            
         }
 
-        public (bool,long) AddNewPlaylist(string newPlayListName, string CurrentUserId)
+        public (bool,long) AddNewPlaylist(string newPlayListName)
         {
-            var user = _auth.CurrentUserId;
+            Guard.ThrowIfNull(newPlayListName);
+
             var playListCount = _unitOfWork.Playlists.Count();
-            var newPlayList = _unitOfWork.Playlists.IncludeTracks(c => c.Name == newPlayListName && c.UserPlaylists.Any(x => x.UserId == CurrentUserId));
+            var newPlayList = _unitOfWork.Playlists.IncludeTracks(c => c.Name == newPlayListName && c.UserPlaylists.Any(x => x.UserId == currentUserId));
 
             if (newPlayList != null)
                 return (false, newPlayList.PlaylistId);
@@ -32,7 +35,7 @@ namespace Chinook.Services
                 PlaylistId = playListCount + 1
             };
 
-            var dataList = new UserPlaylist { UserId = CurrentUserId, Playlist = newPlayList };
+            var dataList = new UserPlaylist { UserId = currentUserId, Playlist = newPlayList };
 
             _unitOfWork.UserPlaylists.Add(dataList);
             if(_unitOfWork.Save() > 0)
@@ -41,9 +44,11 @@ namespace Chinook.Services
             return (false, newPlayList.PlaylistId);
         }
 
-        public async Task<List<ClientModels.Playlists>> GetFilterPlaylistsAsync(long trackId, string CurrentUserId)
+        public async Task<List<ClientModels.Playlists>> GetFilterPlaylistsAsync(long trackId)
         {
-            List<Playlist> playlists = await _unitOfWork.Playlists.IncludeTracksConditionAsync(p => p.UserPlaylists.Any(c => c.UserId == CurrentUserId) && !p.Tracks.Any(c => c.TrackId == trackId));
+            Guard.ThrowIfNull(trackId);
+
+            List<Playlist> playlists = await _unitOfWork.Playlists.IncludeTracksConditionAsync(p => p.UserPlaylists.Any(c => c.UserId == currentUserId) && !p.Tracks.Any(c => c.TrackId == trackId));
 
             return playlists.Select(c => new ClientModels.Playlists
             {
@@ -52,11 +57,11 @@ namespace Chinook.Services
             }).ToList();
         }
 
-        public async Task<ClientModels.Playlist> GetPlaylistAsync(long PlaylistId, string CurrentUserId)
+        public async Task<ClientModels.Playlist> GetPlaylistAsync(long PlaylistId)
         {
             Guard.ThrowIfNull(PlaylistId);
 
-            var playlists = await _unitOfWork.Playlists.ThenIncludeTracks(p => p.PlaylistId == PlaylistId && p.UserPlaylists.Any(c => c.UserId == CurrentUserId));
+            var playlists = await _unitOfWork.Playlists.ThenIncludeTracks(p => p.PlaylistId == PlaylistId && p.UserPlaylists.Any(c => c.UserId == currentUserId));
             var data = new ClientModels.Playlist
             {
                 Name = playlists?.Name ?? string.Empty,
@@ -66,17 +71,17 @@ namespace Chinook.Services
                     ArtistName = t.Album?.Artist.Name ?? string.Empty,
                     TrackId = t.TrackId,
                     TrackName = t.Name,
-                    IsFavorite = t.Playlists.Where(p => p.UserPlaylists != null && p.UserPlaylists.Any(up => up.UserId == CurrentUserId && up.Playlist.Name == FilterType.Favorites)).Any()
+                    IsFavorite = t.Playlists.Where(p => p.UserPlaylists != null && p.UserPlaylists.Any(up => up.UserId == currentUserId && up.Playlist.Name == FilterType.Favorites)).Any()
                 }).ToList()
             };
 
             return data;
         }
 
-        public IList<ClientModels.Playlists> GetPlaylistsByUserId(string CurrentUserId)
+        public IList<ClientModels.Playlists> GetPlaylistsByUserId()
         {
             var playlists = _unitOfWork.Playlists
-                    .GetPlaylistsByUserId(p => p.UserPlaylists.Any(c => c.UserId == CurrentUserId));
+                    .GetPlaylistsByUserId(p => p.UserPlaylists.Any(c => c.UserId == currentUserId));
 
             return playlists.Select(c => new ClientModels.Playlists
             {

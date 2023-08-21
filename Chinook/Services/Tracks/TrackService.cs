@@ -6,38 +6,46 @@ using Microsoft.EntityFrameworkCore;
 using NuGet.DependencyResolver;
 using System.Linq;
 using System.Net.NetworkInformation;
+using Chinook.Services.Auth;
+using Chinook.Utilities.Validation;
 
 namespace Chinook.Services
 {
     public class TrackService : ITrackService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly string currentUserId;
 
-        public TrackService(IUnitOfWork unitOfWork)
+        public TrackService(IUnitOfWork unitOfWork, IAuthService auth)
         {
             _unitOfWork = unitOfWork;
+             currentUserId = auth.CurrentUserId;
         }
-        public List<PlaylistTrack> GetPlaylistTracksByArtistId(long ArtistId, string CurrentUserId)
+        public List<PlaylistTrack> GetPlaylistTracksByArtistId(long artistId)
         {
-            var Artist = _unitOfWork.Artists.Get(a => a.ArtistId == ArtistId);
+            Guard.ThrowIfNull(artistId);
 
-            return _unitOfWork.Tracks.Where(a => a.Album.ArtistId == ArtistId)
+            var Artist = _unitOfWork.Artists.Get(a => a.ArtistId == artistId);
+
+            return _unitOfWork.Tracks.Where(a => a.Album.ArtistId == artistId)
                         .Include(a => a.Album)
                         .Select(t => new PlaylistTrack()
                         {
                             AlbumTitle = (t.Album == null ? "-" : t.Album.Title),
                             TrackId = t.TrackId,
                             TrackName = t.Name,
-                            IsFavorite = t.Playlists.Where(p => p.UserPlaylists.Any(up => up.UserId == CurrentUserId && up.Playlist.Name == FilterType.Favorites)).Any()
+                            IsFavorite = t.Playlists.Where(p => p.UserPlaylists.Any(up => up.UserId == currentUserId && up.Playlist.Name == FilterType.Favorites)).Any()
                         })
                         .ToList();
         }
 
-        public int AddFavoriteTrack(long trackId, string CurrentUserId)
+        public int AddFavoriteTrack(long trackId)
         {
+            Guard.ThrowIfNull(trackId);
+
             var playListCount = _unitOfWork.Playlists.Count();
 
-            var playList = _unitOfWork.Playlists.Get(c => c.Name == FilterType.Favorites && c.UserPlaylists.Any(x => x.UserId == CurrentUserId));
+            var playList = _unitOfWork.Playlists.Get(c => c.Name == FilterType.Favorites && c.UserPlaylists.Any(x => x.UserId == currentUserId));
             var selectedTrack = _unitOfWork.Tracks.Get(a => a.TrackId == trackId);
 
             if (playList != null && selectedTrack != null)
@@ -57,16 +65,18 @@ namespace Chinook.Services
                 selectedTrack.Playlists.Add(playList);
                 playList.Tracks.Add(selectedTrack);
 
-                var dataList = new UserPlaylist { UserId = CurrentUserId, Playlist = playList };
+                var dataList = new UserPlaylist { UserId = currentUserId, Playlist = playList };
                 _unitOfWork.UserPlaylists.Add(dataList);
             }
 
            return _unitOfWork.Save();
         }
 
-        public (bool, string?) RemoveTrack(long trackId, string CurrentUserId, long? PlaylistId = null)
+        public (bool, string?) RemoveTrack(long trackId, long? playlistId = null)
         {
-            var playList = _unitOfWork.Playlists.IncludeTracks(c => (PlaylistId.HasValue ? c.PlaylistId == PlaylistId : c.Name == FilterType.Favorites) && c.UserPlaylists.Any(x => x.UserId == CurrentUserId));
+            Guard.ThrowIfNull(trackId);
+
+            var playList = _unitOfWork.Playlists.IncludeTracks(c => (playlistId.HasValue ? c.PlaylistId == playlistId : c.Name == FilterType.Favorites) && c.UserPlaylists.Any(x => x.UserId == currentUserId));
             var selectedTrack = _unitOfWork.Tracks.IncludePlayLists(a => a.TrackId == trackId);
 
             if (playList != null && selectedTrack != null)
@@ -82,9 +92,12 @@ namespace Chinook.Services
             return (false, playList.Name);
         }
 
-        public int AddExistPlayList(long trackId, string CurrentUserId, long? existPlayList = null)
+        public int AddExistPlayList(long trackId, long? existPlayList = null)
         {
-            var playList = _unitOfWork.Playlists.IncludeTracks(c => c.PlaylistId == existPlayList && c.UserPlaylists.Any(x => x.UserId == CurrentUserId));
+            Guard.ThrowIfNull(trackId);
+            Guard.ThrowIfNull(existPlayList);
+
+            var playList = _unitOfWork.Playlists.IncludeTracks(c => c.PlaylistId == existPlayList && c.UserPlaylists.Any(x => x.UserId == currentUserId));
             var selectedTrack = _unitOfWork.Tracks.IncludePlayLists(a => a.TrackId == trackId);
 
             if (playList != null && selectedTrack != null)

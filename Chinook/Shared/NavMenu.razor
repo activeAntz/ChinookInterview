@@ -36,28 +36,18 @@
 
 @code {
     private IList<Playlists> PlayLists;
-    [CascadingParameter] private Task<AuthenticationState> authenticationState { get; set; }
     private bool collapseNavMenu = true;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-    private string CurrentUserId;
 
     protected override async Task OnInitializedAsync()
     {
         await InvokeAsync(StateHasChanged);
-        CurrentUserId = await GetUserId();
-        PlayLists = playListService.GetPlaylistsByUserId(CurrentUserId);
+        PlayLists = playListService.GetPlaylistsByUserId();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await OnInitializedAsync();
-    }
-
-    private async Task<string> GetUserId()
-    {
-        var user = (await authenticationState).User;
-        var userId = user.FindFirst(u => u.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
-        return userId;
     }
 
     private void ToggleNavMenu()

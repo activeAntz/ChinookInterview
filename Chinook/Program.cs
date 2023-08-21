@@ -7,6 +7,7 @@ using Chinook.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Chinook.Services.Auth;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,13 @@ builder.Services.AddScoped<IPlayListService, PlayListService>();
 builder.Services.AddScoped<IArtistService, ArtistService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddTransient<IGlobalErrorService, GlobalErrorService>();
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 
@@ -42,6 +50,7 @@ else
     app.UseHsts();
 }
 
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 

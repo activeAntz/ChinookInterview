@@ -4,6 +4,7 @@
 @using Chinook.Core.Data.Models;
 @using Chinook.Core.Data
 @using Chinook.ClientModels
+@using Chinook.Pages.Components
 @using Chinook.Services;
 @using Microsoft.EntityFrameworkCore
 @using System.Security.Claims;
@@ -11,21 +12,9 @@
 @inject ITrackService trackService;
 @inject IPlayListService playListService;
 @inject IArtistService artistService;
+@inject IGlobalErrorService globalErrorService;
 
-@if (!string.IsNullOrWhiteSpace(InfoMessage) || !string.IsNullOrWhiteSpace(ErrorMessage))
-{
-    var alertColor = !string.IsNullOrWhiteSpace(InfoMessage) ? "info" : "danger";
-    var message = !string.IsNullOrWhiteSpace(InfoMessage) ? InfoMessage : ErrorMessage;
-
-    <div class="alert alert-@alertColor fade show">
-        <div class="d-flex align-items-start">
-            <div class="flex-grow-1">
-                @message
-            </div>
-            <button type="button" class="btn-close" aria-label="Close" @onclick="CloseInfoMessage"></button>
-        </div>
-    </div>
-}
+<AlertComponent Message="Message" OnClick="CloseInfoMessage" />
 
 @if (Artist == null)
 {
@@ -67,104 +56,6 @@ else
 
 }
 
-@code {
-    [Parameter] public long ArtistId { get; set; }
-    [CascadingParameter] private Task<AuthenticationState> authenticationState { get; set; }
-
-    private Modal PlaylistDialog { get; set; }
-    private Artist Artist;
-    private List<PlaylistTrack> Tracks;
-    private PlaylistTrack SelectedTrack;
-    private string InfoMessage;
-    private string newPlayList = string.Empty;
-    private long? existPlayList = null;
-    private string CurrentUserId;
-    private string ErrorMessage;
-
-    private List<Playlists> PlayLists = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await InvokeAsync(StateHasChanged);
-        CurrentUserId = await GetUserId();
-
-        Artist = artistService.GetArtist(ArtistId);
-        Tracks = trackService.GetPlaylistTracksByArtistId(ArtistId, CurrentUserId);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await OnInitializedAsync();
-    }
-
-    private async Task<string> GetUserId()
-    {
-        var user = (await authenticationState).User;
-        var userId = user.FindFirst(u => u.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
-        return userId;
-    }
-
-    private void FavoriteTrack(long trackId)
-    {
-        var track = Tracks.FirstOrDefault(t => t.TrackId == trackId);
-
-        var state = trackService.AddFavoriteTrack(trackId, CurrentUserId);
-
-        if (state == 1)  InfoMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} added to playlist Favorites.";
-        else ErrorMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not added to playlist Favorites.";
-    }
-
-    private void UnfavoriteTrack(long trackId)
-    {
-        var track = Tracks.FirstOrDefault(t => t.TrackId == trackId);
-
-        var (state, name) = trackService.RemoveTrack(trackId, CurrentUserId);
-
-        if (state)  InfoMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} removed from playlist Favorites.";
-        else ErrorMessage = $"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not removed from playlist Favorites.";
-    }
-
-    private async void OpenPlaylistDialog(long trackId)
-    {
-        CloseInfoMessage();
-        SelectedTrack = Tracks.FirstOrDefault(t => t.TrackId == trackId);
-
-        PlayLists = await playListService.GetFilterPlaylistsAsync(trackId, CurrentUserId);
-        existPlayList = PlayLists.Select(c => c.playListId).FirstOrDefault();
-
-        PlaylistDialog.Open();
-    }
-
-    private void AddTrackToPlaylist()
-    {
-        CloseInfoMessage();
-        var state = 0;
-
-        if (existPlayList != null) state = trackService.AddExistPlayList(SelectedTrack.TrackId, CurrentUserId, existPlayList);
-
-        if (!string.IsNullOrEmpty(newPlayList)){
-            var (isAdded, newPlayListId) = playListService.AddNewPlaylist(newPlayList, CurrentUserId);
-
-            if (!isAdded)
-                ErrorMessage = $"The {newPlayList} Playlist already contains the playlists";
-
-            state = trackService.AddExistPlayList(SelectedTrack.TrackId, CurrentUserId, newPlayListId);
-        }
-
-        if (state == 1) InfoMessage = $"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} added to playlist {newPlayList}.";
-        else ErrorMessage = $"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} can not added to playlist {newPlayList}.";
-
-        newPlayList = string.Empty;
-        PlaylistDialog.Close();
-    }
-
-    private void CloseInfoMessage()
-    {
-        InfoMessage = "";
-        ErrorMessage = "";
-    }
-}
-
 <Modal @ref="PlaylistDialog">
     <Title>
         Add to playlist
@@ -182,7 +73,7 @@ else
             <select class="form-control" id="ExistingPlaylist" @bind="existPlayList">
                 @foreach (var item in PlayLists)
                 {
-                    <option value="@item.playListId" >@item.Name</option>
+                    <option value="@item.playListId">@item.Name</option>
                 }
             </select>
         </div>

@@ -2,28 +2,37 @@
 using Chinook.Core.Data.Models;
 using Chinook.Utilities.Validation;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+using AutoMapper;
+using Chinook.ClientModels;
 
 namespace Chinook.Services
 {
     public class ArtistService : IArtistService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ArtistService(IUnitOfWork unitOfWork)
+        public ArtistService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public Artist GetArtist(long artistId)
+        public ArtistDto GetArtist(long artistId)
         {
             Guard.ThrowIfNull(artistId);
 
-            return _unitOfWork.Artists.Get(c => c.ArtistId == artistId);
+            var artist = _unitOfWork.Artists.Get(c => c.ArtistId == artistId);
+            var mapArtist = _mapper.Map<ArtistDto>(artist);
+
+            return mapArtist;
         }
 
-        public async Task<List<Artist>> GetArtistsAsync()
+        public async Task<List<ArtistsDto>> GetArtistsAsync()
         {
-            return await _unitOfWork.Artists.GetArtistsAsync();
+            var artists = await _unitOfWork.Artists.GetArtistsAsync();
+            var mapArtist = _mapper.Map<List<ArtistsDto>>(artists);
+            return mapArtist;
         }
     }
 }

@@ -1,3 +1,4 @@
+using Chinook.ClientModels;
 using Chinook.Core.Data.Models;
 using Serilog;
 
@@ -5,7 +6,7 @@ namespace Chinook.Pages
 {
     public partial class Index
     {
-        private List<Artist> Artists;
+        private List<ArtistsDto> Artists;
         protected override async Task OnInitializedAsync()
         {
             await InvokeAsync(StateHasChanged);

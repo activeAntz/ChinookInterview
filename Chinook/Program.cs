@@ -30,6 +30,8 @@ builder.Services.AddScoped<IArtistService, ArtistService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddTransient<IGlobalErrorService, GlobalErrorService>();
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();

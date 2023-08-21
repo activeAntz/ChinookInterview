@@ -1,6 +1,5 @@
 using global::Microsoft.AspNetCore.Components;
 using Chinook.Shared.Components;
-using Chinook.Core.Data.Models;
 using Chinook.ClientModels;
 using Chinook.Utilities.Validation;
 using Serilog;
@@ -12,7 +11,7 @@ public partial class ArtistPage
     public long ArtistId { get; set; }
 
     private Modal PlaylistDialog { get; set; } = new Modal();
-    private Artist Artist = new();
+    private ArtistDto Artist = new();
     private List<PlaylistTrack> Tracks = new();
     private PlaylistTrack SelectedTrack = new();
     private string newPlayList = string.Empty;

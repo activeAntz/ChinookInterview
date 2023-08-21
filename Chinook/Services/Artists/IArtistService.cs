@@ -1,10 +1,11 @@
-﻿using Chinook.Core.Data.Models;
+﻿using Chinook.ClientModels;
+using Chinook.Core.Data.Models;
 
 namespace Chinook.Services
 {
     public interface IArtistService
     {
-        Task<List<Artist>> GetArtistsAsync();
-        Artist GetArtist(long artistId);
+        Task<List<ArtistsDto>> GetArtistsAsync();
+        ArtistDto GetArtist(long artistId);
     }
 }

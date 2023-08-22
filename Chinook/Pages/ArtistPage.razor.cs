@@ -38,7 +38,7 @@ public partial class ArtistPage
         {
             var track = Tracks.FirstOrDefault(t => t.TrackId == trackId);
 
-            Guard.ThrowIfObjectNotFount(track);
+            Guard.ThrowIfObjectNotFound(track);
 
             var state = trackService.AddFavoriteTrack(trackId);
 
@@ -60,7 +60,7 @@ public partial class ArtistPage
         {
             var track = Tracks.FirstOrDefault(t => t.TrackId == trackId);
 
-            Guard.ThrowIfObjectNotFount(track);
+            Guard.ThrowIfObjectNotFound(track);
 
             var (state, name) = trackService.RemoveTrack(trackId);
 
@@ -83,7 +83,7 @@ public partial class ArtistPage
             CloseInfoMessage();
             SelectedTrack = Tracks.FirstOrDefault(t => t.TrackId == trackId);
 
-            Guard.ThrowIfObjectNotFount(SelectedTrack);
+            Guard.ThrowIfObjectNotFound(SelectedTrack);
 
             Playlists = await playListService.GetFilterPlaylistsByTrackIdAsync(trackId);
             ExistPlaylist = Playlists.Select(c => c.PlaylistId).FirstOrDefault();

@@ -17,7 +17,7 @@ namespace Chinook.Utilities.Validation
                 throw new ArgumentException("String cannot be null or empty.");
         }
 
-        public static void ThrowIfObjectNotFount(object obj)
+        public static void ThrowIfObjectNotFound(object obj)
         {
             if (obj == null)
                 throw new ArgumentNullException("Data object not found");

@@ -44,7 +44,7 @@
         await InvokeAsync(StateHasChanged);
         Playlists = playListService.GetPlaylists();
     }
-
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await OnInitializedAsync();

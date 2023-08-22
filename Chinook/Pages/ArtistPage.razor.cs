@@ -113,6 +113,8 @@ public partial class ArtistPage
 
                 if (!isAdded)
                     globalErrorService.SetError($"The {PlaylistName} playlist already contains in the playlists");
+
+                if (ExistPlaylist == 0) state = trackService.AddExistPlayList(SelectedTrack.TrackId, playlistId);
             }
 
             if (state > 0)

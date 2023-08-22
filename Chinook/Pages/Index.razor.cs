@@ -1,5 +1,4 @@
 using Chinook.ClientModels;
-using Chinook.Core.Data.Models;
 using Serilog;
 
 namespace Chinook.Pages

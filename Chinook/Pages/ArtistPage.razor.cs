@@ -63,6 +63,7 @@ public partial class ArtistPage
             Guard.ThrowIfObjectNotFount(track);
 
             var (state, name) = trackService.RemoveTrack(trackId);
+
             if (state)
                 globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} removed from playlist Favorites.");
             else
@@ -106,13 +107,15 @@ public partial class ArtistPage
                 state = trackService.AddExistPlayList(SelectedTrack.TrackId, ExistPlaylist);
             if (!string.IsNullOrEmpty(PlaylistName))
             {
-                var (isAdded, playlistId) = playListService.AddNewPlaylist(PlaylistName);
+                var (isAdded, playlistId) = playListService.AddPlaylist(PlaylistName);
+
                 if (!isAdded)
                     globalErrorService.SetError($"The {PlaylistName} Playlist already contains the playlists");
+
                 state = trackService.AddExistPlayList(SelectedTrack.TrackId, playlistId);
             }
 
-            if (state == 1)
+            if (state > 1)
                 globalErrorService.SetInfo($"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} added to playlist {PlaylistName}.");
             else
                 globalErrorService.SetError($"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} can not added to playlist {PlaylistName}.");

@@ -21,19 +21,19 @@ namespace Chinook.Services
             _mapper = mapper;
         }
 
-        public (bool, long) AddNewPlaylist(string newPlayListName)
+        public (bool, long) AddPlaylist(string playlistName)
         {
-            Guard.ThrowIfNull(newPlayListName);
+            Guard.ThrowIfNull(playlistName);
 
             var playListCount = _unitOfWork.Playlists.Count();
-            var newPlayList = _unitOfWork.Playlists.IncludeTracks(c => c.Name == newPlayListName && c.UserPlaylists.Any(x => x.UserId == currentUserId));
+            var newPlayList = _unitOfWork.Playlists.IncludeTracks(c => c.Name == playlistName && c.UserPlaylists.Any(x => x.UserId == currentUserId));
 
             if (newPlayList != null)
                 return (false, newPlayList.PlaylistId);
 
             newPlayList = new Playlist
             {
-                Name = newPlayListName,
+                Name = playlistName,
                 PlaylistId = playListCount + 1
             };
 

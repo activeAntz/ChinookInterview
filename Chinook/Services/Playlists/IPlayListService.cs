@@ -7,6 +7,6 @@ namespace Chinook.Services
         Task<PlaylistDto> GetPlaylistByIdAsync(long id);
         List<PlaylistsDto> GetPlaylists(); 
         Task<List<PlaylistsDto>> GetFilterPlaylistsByTrackIdAsync(long trackId);
-        (bool,long) AddNewPlaylist(string newPlayListName);
+        (bool,long) AddPlaylist(string newPlayListName);
     }
 }

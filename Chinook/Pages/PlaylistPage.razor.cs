@@ -1,5 +1,4 @@
 using global::Microsoft.AspNetCore.Components;
-using Chinook.Core.Data.Models;
 using Chinook.ClientModels;
 using Serilog;
 

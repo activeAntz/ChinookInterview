@@ -1,0 +1,26 @@
+﻿@using Chinook.ClientModels;
+
+@if (Message != null)
+{
+    @foreach (var item in Message)
+    {
+        <div class="alert alert-@item.Type fade show">
+            <div class="d-flex align-items-start">
+                <div class="flex-grow-1">
+                    @item.Message
+                </div>
+                <button type="button" class="btn-close" aria-label="Close" @onclick="CloseInfoMessage"></button>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public List<MessageDto> Message { get; set; } = new();
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+
+    private void CloseInfoMessage()
+    {
+        OnClick.InvokeAsync();
+    }
+}

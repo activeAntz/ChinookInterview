@@ -1,0 +1,17 @@
+﻿<div class="row">
+    <div class="col-11">
+        <input type="text" id="searchArtist" class="form-control" @bind="filter" placeholder="Name for the new playlist">
+    </div>
+    <div class="col-1">
+        <button class="btn btn-outline-success" @onclick="HandleSearch">Search</button>
+    </div>
+</div>
+@code {
+    private string filter;
+    [Parameter] public EventCallback<string> OnSearch { get; set; }
+
+    private void HandleSearch()
+    {
+        OnSearch.InvokeAsync(filter);
+    }
+}

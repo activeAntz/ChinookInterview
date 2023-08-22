@@ -38,7 +38,7 @@ public partial class ArtistPage
         {
             var track = Tracks.FirstOrDefault(t => t.TrackId == trackId);
 
-            Guard.ThrowIfObjectNotFount(track);
+            Guard.ThrowIfObjectNotFound(track);
 
             var state = trackService.AddFavoriteTrack(trackId);
 
@@ -60,7 +60,7 @@ public partial class ArtistPage
         {
             var track = Tracks.FirstOrDefault(t => t.TrackId == trackId);
 
-            Guard.ThrowIfObjectNotFount(track);
+            Guard.ThrowIfObjectNotFound(track);
 
             var (state, name) = trackService.RemoveTrack(trackId);
 
@@ -83,7 +83,7 @@ public partial class ArtistPage
             CloseInfoMessage();
             SelectedTrack = Tracks.FirstOrDefault(t => t.TrackId == trackId);
 
-            Guard.ThrowIfObjectNotFount(SelectedTrack);
+            Guard.ThrowIfObjectNotFound(SelectedTrack);
 
             Playlists = await playListService.GetFilterPlaylistsByTrackIdAsync(trackId);
             ExistPlaylist = Playlists.Select(c => c.PlaylistId).FirstOrDefault();
@@ -102,10 +102,8 @@ public partial class ArtistPage
         try
         {
             CloseInfoMessage();
-            var state = 0;
 
-            if (ExistPlaylist != 0)
-                state = trackService.AddExistPlayList(SelectedTrack.TrackId, ExistPlaylist);
+            var state = 0;
 
             if (!string.IsNullOrEmpty(PlaylistName))
             {
@@ -114,7 +112,12 @@ public partial class ArtistPage
                 if (!isAdded)
                     globalErrorService.SetError($"The {PlaylistName} playlist already contains in the playlists");
 
-                if (ExistPlaylist == 0) state = trackService.AddExistPlayList(SelectedTrack.TrackId, playlistId);
+                state = trackService.AddExistPlayList(SelectedTrack.TrackId, playlistId);
+            }
+            else
+            {
+                if (ExistPlaylist != 0)
+                    state = trackService.AddExistPlayList(SelectedTrack.TrackId, ExistPlaylist);
             }
 
             if (state > 0)

@@ -102,10 +102,8 @@ public partial class ArtistPage
         try
         {
             CloseInfoMessage();
-            var state = 0;
 
-            if (ExistPlaylist != 0)
-                state = trackService.AddExistPlayList(SelectedTrack.TrackId, ExistPlaylist);
+            var state = 0;
 
             if (!string.IsNullOrEmpty(PlaylistName))
             {
@@ -114,7 +112,12 @@ public partial class ArtistPage
                 if (!isAdded)
                     globalErrorService.SetError($"The {PlaylistName} playlist already contains in the playlists");
 
-                if (ExistPlaylist == 0) state = trackService.AddExistPlayList(SelectedTrack.TrackId, playlistId);
+                state = trackService.AddExistPlayList(SelectedTrack.TrackId, playlistId);
+            }
+            else
+            {
+                if (ExistPlaylist != 0)
+                    state = trackService.AddExistPlayList(SelectedTrack.TrackId, ExistPlaylist);
             }
 
             if (state > 0)

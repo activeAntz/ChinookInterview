@@ -45,7 +45,7 @@ namespace Chinook.Pages
             {
                 var track = Playlist.Tracks.FirstOrDefault(t => t.TrackId == trackId);
                 var state = trackService.AddFavoriteTrack(trackId);
-                if (state > 1)
+                if (state > 0)
                     globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} added to playlist Favorites.");
                 else
                     globalErrorService.SetError($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not added to playlist Favorites.");

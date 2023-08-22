@@ -96,7 +96,6 @@ namespace Chinook.Services
         public int AddExistPlayList(long trackId, long? existPlayList = null)
         {
             Guard.ThrowIfNull(trackId);
-            Guard.ThrowIfNull(existPlayList);
 
             var playList = _unitOfWork.Playlists.IncludeTracks(c => c.PlaylistId == existPlayList && c.UserPlaylists.Any(x => x.UserId == currentUserId));
             var selectedTrack = _unitOfWork.Tracks.IncludePlayLists(a => a.TrackId == trackId);

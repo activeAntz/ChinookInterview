@@ -42,7 +42,7 @@ public partial class ArtistPage
 
             var state = trackService.AddFavoriteTrack(trackId);
 
-            if (state > 1)
+            if (state > 0)
                 globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} added to playlist Favorites.");
             else
                 globalErrorService.SetError($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not added to playlist Favorites.");
@@ -103,19 +103,19 @@ public partial class ArtistPage
         {
             CloseInfoMessage();
             var state = 0;
-            if (ExistPlaylist != null)
+
+            if (ExistPlaylist != 0)
                 state = trackService.AddExistPlayList(SelectedTrack.TrackId, ExistPlaylist);
+
             if (!string.IsNullOrEmpty(PlaylistName))
             {
                 var (isAdded, playlistId) = playListService.AddPlaylist(PlaylistName);
 
                 if (!isAdded)
-                    globalErrorService.SetError($"The {PlaylistName} Playlist already contains the playlists");
-
-                state = trackService.AddExistPlayList(SelectedTrack.TrackId, playlistId);
+                    globalErrorService.SetError($"The {PlaylistName} playlist already contains in the playlists");
             }
 
-            if (state > 1)
+            if (state > 0)
                 globalErrorService.SetInfo($"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} added to playlist {PlaylistName}.");
             else
                 globalErrorService.SetError($"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} can not added to playlist {PlaylistName}.");

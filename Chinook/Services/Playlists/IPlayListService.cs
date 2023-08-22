@@ -1,10 +1,12 @@
-﻿namespace Chinook.Services
+﻿using Chinook.ClientModels;
+
+namespace Chinook.Services
 {
-    public interface IPlayListService
+    public interface IPlaylistService
     {
-        Task<ClientModels.Playlist> GetPlaylistAsync(long PlaylistId);
-        IList<ClientModels.Playlists> GetPlaylistsByUserId(); 
-        Task<List<ClientModels.Playlists>> GetFilterPlaylistsAsync(long trackId);
+        Task<PlaylistDto> GetPlaylistByIdAsync(long id);
+        List<PlaylistsDto> GetPlaylists(); 
+        Task<List<PlaylistsDto>> GetFilterPlaylistsByTrackIdAsync(long trackId);
         (bool,long) AddNewPlaylist(string newPlayListName);
     }
 }

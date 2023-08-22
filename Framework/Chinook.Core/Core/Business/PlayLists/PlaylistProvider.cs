@@ -21,14 +21,16 @@ namespace Chinook.Core.Business.PlayLists
             return _dbSet.Include(c => c.Tracks).FirstOrDefault(predicate);
         }
 
-        public async Task<List<Playlist>> IncludeTracksConditionAsync(Expression<Func<Playlist, bool>> predicate)
+        public async Task<List<Playlist>> IncludeTracksWithConditionAsync(Expression<Func<Playlist, bool>> predicate)
         {
             return await _dbSet.Include(c => c.Tracks).Where(predicate).ToListAsync();
         }
 
         public async Task<Playlist?> ThenIncludeTracks(Expression<Func<Playlist, bool>> predicate)
         {
-            return await _dbSet.Include(c => c.Tracks).ThenInclude(c => c.Album).ThenInclude(c => c.Artist).Include(c => c.UserPlaylists).FirstOrDefaultAsync(predicate);
+            return await _dbSet.Include(c => c.Tracks).ThenInclude(c => c.Album).ThenInclude(c => c.Artist)
+                .Include(c => c.Tracks).ThenInclude(c => c.Playlists).ThenInclude(c => c.UserPlaylists)
+                .FirstOrDefaultAsync(predicate);
         }
     }
 }

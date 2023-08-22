@@ -1,8 +1,8 @@
 ﻿namespace Chinook.ClientModels
 {
-    public class Playlists
+    public class PlaylistsDto
     {
-        public long playListId { get; set; } = new long();
+        public long PlaylistId { get; set; } = 0;
         public string Name { get; set; } = string.Empty;
     }
 }

@@ -3,7 +3,7 @@
 @using Microsoft.EntityFrameworkCore;
 @using System.Security.Claims;
 
-@inject IPlayListService playListService;
+@inject IPlaylistService playListService;
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -22,9 +22,9 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            @foreach (var playlist in PlayLists)
+            @foreach (var playlist in Playlists)
             {
-                var path = "playlist/" + @playlist.playListId;
+                var path = "playlist/" + @playlist.PlaylistId;
                 <NavLink class="nav-link" href=@path Match="NavLinkMatch.All">
                     <i class="bi bi-music-note-list me-3" style="font-size: 1.25em"></i>@playlist.Name
                 </NavLink>
@@ -35,14 +35,14 @@
 </div>
 
 @code {
-    private IList<Playlists> PlayLists;
-    private bool collapseNavMenu = true;
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private List<PlaylistsDto> Playlists = new List<PlaylistsDto>();
+    private bool CollapseNavMenu = true;
+    private string? NavMenuCssClass => CollapseNavMenu ? "collapse" : null;
 
     protected override async Task OnInitializedAsync()
     {
         await InvokeAsync(StateHasChanged);
-        PlayLists = playListService.GetPlaylistsByUserId();
+        Playlists = playListService.GetPlaylists();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -52,6 +52,6 @@
 
     private void ToggleNavMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        CollapseNavMenu = !CollapseNavMenu;
     }
 }

@@ -10,7 +10,7 @@
 @using System.Security.Claims;
 
 @inject ITrackService trackService;
-@inject IPlayListService playListService;
+@inject IPlaylistService playListService;
 @inject IArtistService artistService;
 @inject IGlobalErrorService globalErrorService;
 
@@ -70,16 +70,16 @@ else
 
         <div class="form-group mb-2">
             <label for="ExistingPlaylist">Add to existing playlist</label>
-            <select class="form-control" id="ExistingPlaylist" @bind="existPlayList">
-                @foreach (var item in PlayLists)
+            <select class="form-control" id="ExistingPlaylist" @bind="ExistPlaylist">
+                @foreach (var item in Playlists)
                 {
-                    <option value="@item.playListId">@item.Name</option>
+                    <option value="@item.PlaylistId">@item.Name</option>
                 }
             </select>
         </div>
         <div class="form-group mb-2">
             <label for="NewPlaylist">Create new playlist</label>
-            <input type="text" id="NewPlaylist" class="form-control" @bind="newPlayList" placeholder="Name for the new playlist">
+            <input type="text" id="NewPlaylist" class="form-control" @bind="PlaylistName" placeholder="Name for the new playlist">
         </div>
     </Body>
     <Footer>

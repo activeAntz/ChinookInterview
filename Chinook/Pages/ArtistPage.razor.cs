@@ -12,12 +12,12 @@ public partial class ArtistPage
 
     private Modal PlaylistDialog { get; set; } = new Modal();
     private ArtistDto Artist = new();
-    private List<PlaylistTrack> Tracks = new();
-    private PlaylistTrack SelectedTrack = new();
-    private string newPlayList = string.Empty;
-    private long? existPlayList = null;
+    private List<PlaylistTrackDto> Tracks = new();
+    private PlaylistTrackDto SelectedTrack = new();
+    private string PlaylistName = string.Empty;
+    private long ExistPlaylist = 0;
     private List<MessageDto> Message = new();
-    private List<Playlists> PlayLists = new();
+    private List<PlaylistsDto> Playlists = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,7 +42,7 @@ public partial class ArtistPage
 
             var state = trackService.AddFavoriteTrack(trackId);
 
-            if (state == 1)
+            if (state > 1)
                 globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} added to playlist Favorites.");
             else
                 globalErrorService.SetError($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not added to playlist Favorites.");
@@ -84,8 +84,8 @@ public partial class ArtistPage
 
             Guard.ThrowIfObjectNotFount(SelectedTrack);
 
-            PlayLists = await playListService.GetFilterPlaylistsAsync(trackId);
-            existPlayList = PlayLists.Select(c => c.playListId).FirstOrDefault();
+            Playlists = await playListService.GetFilterPlaylistsByTrackIdAsync(trackId);
+            ExistPlaylist = Playlists.Select(c => c.PlaylistId).FirstOrDefault();
 
             PlaylistDialog.Open();
         }
@@ -102,22 +102,22 @@ public partial class ArtistPage
         {
             CloseInfoMessage();
             var state = 0;
-            if (existPlayList != null)
-                state = trackService.AddExistPlayList(SelectedTrack.TrackId, existPlayList);
-            if (!string.IsNullOrEmpty(newPlayList))
+            if (ExistPlaylist != null)
+                state = trackService.AddExistPlayList(SelectedTrack.TrackId, ExistPlaylist);
+            if (!string.IsNullOrEmpty(PlaylistName))
             {
-                var (isAdded, newPlayListId) = playListService.AddNewPlaylist(newPlayList);
+                var (isAdded, playlistId) = playListService.AddNewPlaylist(PlaylistName);
                 if (!isAdded)
-                    globalErrorService.SetError($"The {newPlayList} Playlist already contains the playlists");
-                state = trackService.AddExistPlayList(SelectedTrack.TrackId, newPlayListId);
+                    globalErrorService.SetError($"The {PlaylistName} Playlist already contains the playlists");
+                state = trackService.AddExistPlayList(SelectedTrack.TrackId, playlistId);
             }
 
             if (state == 1)
-                globalErrorService.SetInfo($"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} added to playlist {newPlayList}.");
+                globalErrorService.SetInfo($"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} added to playlist {PlaylistName}.");
             else
-                globalErrorService.SetError($"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} can not added to playlist {newPlayList}.");
+                globalErrorService.SetError($"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} can not added to playlist {PlaylistName}.");
 
-            newPlayList = string.Empty;
+            PlaylistName = string.Empty;
             PlaylistDialog.Close();
         }
         catch (Exception ex)

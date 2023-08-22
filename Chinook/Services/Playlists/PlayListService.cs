@@ -3,23 +3,25 @@ using Chinook.Core.Uow;
 using Chinook.Core.Data.Models;
 using Chinook.Utilities.Validation;
 using Chinook.Services.Auth;
-using NuGet.DependencyResolver;
+using Chinook.ClientModels;
+using AutoMapper;
 
 namespace Chinook.Services
 {
-    public class PlayListService : IPlayListService
+    public class PlaylistService : IPlaylistService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly string currentUserId;
+        private readonly IMapper _mapper;
 
-        public PlayListService(IUnitOfWork unitOfWork, IAuthService auth)
+        public PlaylistService(IUnitOfWork unitOfWork, IAuthService auth, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             currentUserId = auth.CurrentUserId;
-            
+            _mapper = mapper;
         }
 
-        public (bool,long) AddNewPlaylist(string newPlayListName)
+        public (bool, long) AddNewPlaylist(string newPlayListName)
         {
             Guard.ThrowIfNull(newPlayListName);
 
@@ -38,34 +40,33 @@ namespace Chinook.Services
             var dataList = new UserPlaylist { UserId = currentUserId, Playlist = newPlayList };
 
             _unitOfWork.UserPlaylists.Add(dataList);
-            if(_unitOfWork.Save() > 0)
+            if (_unitOfWork.Save() > 0)
                 return (true, newPlayList.PlaylistId);
 
             return (false, newPlayList.PlaylistId);
         }
 
-        public async Task<List<ClientModels.Playlists>> GetFilterPlaylistsAsync(long trackId)
+        public async Task<List<PlaylistsDto>> GetFilterPlaylistsByTrackIdAsync(long trackId)
         {
             Guard.ThrowIfNull(trackId);
 
-            List<Playlist> playlists = await _unitOfWork.Playlists.IncludeTracksConditionAsync(p => p.UserPlaylists.Any(c => c.UserId == currentUserId) && !p.Tracks.Any(c => c.TrackId == trackId));
+            var playlists = await _unitOfWork.Playlists.IncludeTracksWithConditionAsync(p => p.UserPlaylists.Any(c => c.UserId == currentUserId) && !p.Tracks.Any(c => c.TrackId == trackId));
 
-            return playlists.Select(c => new ClientModels.Playlists
-            {
-                playListId = c.PlaylistId,
-                Name = c.Name
-            }).ToList();
+            var mapPlaylists = _mapper.Map<List<PlaylistsDto>>(playlists);
+
+            return mapPlaylists;
         }
 
-        public async Task<ClientModels.Playlist> GetPlaylistAsync(long PlaylistId)
+        public async Task<PlaylistDto> GetPlaylistByIdAsync(long id)
         {
-            Guard.ThrowIfNull(PlaylistId);
+            Guard.ThrowIfNull(id);
 
-            var playlists = await _unitOfWork.Playlists.ThenIncludeTracks(p => p.PlaylistId == PlaylistId && p.UserPlaylists.Any(c => c.UserId == currentUserId));
-            var data = new ClientModels.Playlist
+            var playlists = await _unitOfWork.Playlists.ThenIncludeTracks(p => p.PlaylistId == id && p.UserPlaylists.Any(c => c.UserId == currentUserId));
+
+            var data = new PlaylistDto
             {
-                Name = playlists?.Name ?? string.Empty,
-                Tracks = playlists.Tracks.Select(t => new ClientModels.PlaylistTrack()
+                Name = playlists.Name,
+                Tracks = playlists.Tracks.Select(t => new PlaylistTrackDto()
                 {
                     AlbumTitle = t.Album?.Title ?? string.Empty,
                     ArtistName = t.Album?.Artist.Name ?? string.Empty,
@@ -78,16 +79,14 @@ namespace Chinook.Services
             return data;
         }
 
-        public IList<ClientModels.Playlists> GetPlaylistsByUserId()
+        public List<PlaylistsDto> GetPlaylists()
         {
             var playlists = _unitOfWork.Playlists
                     .GetPlaylistsByUserId(p => p.UserPlaylists.Any(c => c.UserId == currentUserId));
 
-            return playlists.Select(c => new ClientModels.Playlists
-            {
-                playListId = c.PlaylistId,
-                Name = c.Name
-            }).ToList();
+            var mapPlaylists = _mapper.Map<List<PlaylistsDto>>(playlists);
+
+            return mapPlaylists;
         }
     }
 }

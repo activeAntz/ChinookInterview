@@ -10,14 +10,14 @@ namespace Chinook.Pages
         [Parameter]
         public long PlaylistId { get; set; }
 
-        private ClientModels.Playlist Playlist = new();
+        private PlaylistDto Playlist = new();
         private List<MessageDto> Message = new();
         protected override async Task OnInitializedAsync()
         {
             try
             {
                 await InvokeAsync(StateHasChanged);
-                Playlist = await playListService.GetPlaylistAsync(PlaylistId);
+                Playlist = await playListService.GetPlaylistByIdAsync(PlaylistId);
             }
             catch (Exception ex)
             {
@@ -46,7 +46,7 @@ namespace Chinook.Pages
             {
                 var track = Playlist.Tracks.FirstOrDefault(t => t.TrackId == trackId);
                 var state = trackService.AddFavoriteTrack(trackId);
-                if (state == 1)
+                if (state > 1)
                     globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} added to playlist Favorites.");
                 else
                     globalErrorService.SetError($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not added to playlist Favorites.");

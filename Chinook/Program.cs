@@ -24,7 +24,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ChinookUser>>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITrackService, TrackService>();
-builder.Services.AddScoped<IPlayListService, PlayListService>();
+builder.Services.AddScoped<IPlaylistService, PlaylistService>();
 builder.Services.AddScoped<IArtistService, ArtistService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();

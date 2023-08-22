@@ -6,7 +6,7 @@ namespace Chinook.Pages
 {
     public partial class Index
     {
-        private List<ArtistsDto> Artists;
+        private List<ArtistsDto> Artists = new();
         protected override async Task OnInitializedAsync()
         {
             await InvokeAsync(StateHasChanged);

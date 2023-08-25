@@ -4,7 +4,7 @@ using Chinook.Core.Data.Models;
 using Chinook.Core.Helper;
 using System.Reflection.Metadata;
 
-namespace Chinook.Profiles
+namespace Chinook.MapperProfiles
 {
     public class PlaylistProfile : Profile
     {

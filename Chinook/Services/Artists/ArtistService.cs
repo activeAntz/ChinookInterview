@@ -1,7 +1,5 @@
 ﻿using Chinook.Core.Uow;
-using Chinook.Core.Data.Models;
 using Chinook.Utilities.Validation;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 using AutoMapper;
 using Chinook.ClientModels;
 

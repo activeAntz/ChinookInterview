@@ -14,6 +14,8 @@ namespace Chinook.Services
         private readonly string currentUserId;
         private readonly IMapper _mapper;
 
+        public event Action ClientEventCallBack;
+
         public PlaylistService(IUnitOfWork unitOfWork, IAuthService auth, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -42,6 +44,8 @@ namespace Chinook.Services
             _unitOfWork.UserPlaylists.Add(dataList);
             if (_unitOfWork.Save() > 0)
                 return (true, newPlayList.PlaylistId);
+
+            ClientEventCallBack.Invoke();
 
             return (false, newPlayList.PlaylistId);
         }
@@ -79,10 +83,10 @@ namespace Chinook.Services
             return data;
         }
 
-        public List<PlaylistsDto> GetPlaylists()
+        public async Task<List<PlaylistsDto>> GetPlaylistsAsync()
         {
-            var playlists = _unitOfWork.Playlists
-                    .GetPlaylistsByUserId(p => p.UserPlaylists.Any(c => c.UserId == currentUserId));
+            var playlists = await _unitOfWork.Playlists
+                    .GetPlaylistsByUserIdAsync(p => p.UserPlaylists.Any(c => c.UserId == currentUserId));
 
             var mapPlaylists = _mapper.Map<List<PlaylistsDto>>(playlists);
 

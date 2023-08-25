@@ -1,14 +1,13 @@
-﻿using Chinook.Core.Business.PlayLists;
-using Chinook.Core.Infrastructure.Repositories;
+﻿using Chinook.Core.Infrastructure.Repositories;
 using Chinook.Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace Chinook.Core.Business.Tracks
+namespace Chinook.Core.Repository.Tracks
 {
-    public class TrackProvider : Repository<Track>, ITrackProvider
+    public class TrackRepository : Repository<Track>, ITrackRepository
     {
-        public TrackProvider(DbContext context) : base(context) { }
+        public TrackRepository(DbContext context) : base(context) { }
 
         public Track? IncludePlayLists(Expression<Func<Track, bool>> predicate = null)
         {

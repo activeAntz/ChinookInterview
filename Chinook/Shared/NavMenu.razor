@@ -1,9 +1,11 @@
 ﻿@using Chinook.ClientModels;
 @using Chinook.Services;
+@using Chinook.Utilities.Helper;
 @using Microsoft.EntityFrameworkCore;
 @using System.Security.Claims;
 
 @inject IPlaylistService playListService;
+@inject EventManager eventManager;
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -42,13 +44,15 @@
     protected override async Task OnInitializedAsync()
     {
         await InvokeAsync(StateHasChanged);
-        Playlists = playListService.GetPlaylists();
+        await GetLoad();
+        eventManager.changeEvent += (o, args) =>
+           {
+               _ = GetLoad();
+               InvokeAsync(StateHasChanged);
+           };
     }
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await OnInitializedAsync();
-    }
+
+    private async Task GetLoad() => Playlists = await playListService.GetPlaylistsAsync();
 
     private void ToggleNavMenu()
     {

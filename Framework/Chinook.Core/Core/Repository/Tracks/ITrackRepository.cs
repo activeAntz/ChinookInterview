@@ -2,9 +2,9 @@
 using Chinook.Core.Data.Models;
 using System.Linq.Expressions;
 
-namespace Chinook.Core.Business.Tracks
+namespace Chinook.Core.Repository.Tracks
 {
-    public interface ITrackProvider : IRepository<Track>
+    public interface ITrackRepository : IRepository<Track>
     {
         Track? IncludePlayLists(Expression<Func<Track, bool>> predicate = null);
     }

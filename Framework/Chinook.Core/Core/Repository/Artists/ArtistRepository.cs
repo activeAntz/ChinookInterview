@@ -2,11 +2,11 @@
 using Chinook.Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Chinook.Core.Business.Artists
+namespace Chinook.Core.Repository.Artists
 {
-    public class ArtistProvider : Repository<Artist>, IArtistProvider
+    public class ArtistRepository : Repository<Artist>, IArtistRepository
     {
-        public ArtistProvider(DbContext context) : base(context)
+        public ArtistRepository(DbContext context) : base(context)
         {
         }
 

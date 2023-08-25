@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Chinook.Services.Auth;
 using Serilog;
+using Chinook.Utilities.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,8 @@ builder.Services.AddScoped<IArtistService, ArtistService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddTransient<IGlobalErrorService, GlobalErrorService>();
+
+builder.Services.AddScoped<EventManager>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

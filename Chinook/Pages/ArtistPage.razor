@@ -6,6 +6,7 @@
 @using Chinook.ClientModels
 @using Chinook.Pages.Components
 @using Chinook.Services;
+@using Chinook.Utilities.Helper;
 @using Microsoft.EntityFrameworkCore
 @using System.Security.Claims;
 
@@ -13,6 +14,7 @@
 @inject IPlaylistService playListService;
 @inject IArtistService artistService;
 @inject IGlobalErrorService globalErrorService;
+@inject EventManager eventManager;
 
 <AlertComponent Message="Message" OnClick="CloseInfoMessage" />
 

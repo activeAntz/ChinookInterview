@@ -13,6 +13,12 @@ namespace Chinook.Pages
 
         private PlaylistDto Playlist = new();
         private List<MessageDto> Message = new();
+
+        protected override async Task OnInitializedAsync()
+        {
+            await InitialData();
+        }
+
         protected override Task OnParametersSetAsync()
         {
             try
@@ -97,6 +103,7 @@ namespace Chinook.Pages
         private void CloseInfoMessage()
         {
             globalErrorService.ClearError();
+            InvokeAsync(OnInitializedAsync);
         }
     }
 }

@@ -20,9 +20,17 @@ public partial class ArtistPage
     private List<MessageDto> Message = new();
     private List<PlaylistsDto> Playlists = new();
 
-    private System.Threading.ManualResetEvent Trigger = new System.Threading.ManualResetEvent(false);
-
     protected override async Task OnInitializedAsync()
+    {
+        await OnLoading();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await OnLoading();
+    }
+
+    private async Task OnLoading()
     {
         await InvokeAsync(StateHasChanged);
         Artist = artistService.GetArtist(ArtistId);
@@ -131,6 +139,8 @@ public partial class ArtistPage
 
             eventManager.Invoke();
 
+            _ = InvokeAsync(OnInitializedAsync);
+
             PlaylistDialog.Close();
         }
         catch (Exception ex)
@@ -143,5 +153,6 @@ public partial class ArtistPage
     public void CloseInfoMessage()
     {
         globalErrorService.ClearError();
+        InvokeAsync(OnInitializedAsync);
     }
 }

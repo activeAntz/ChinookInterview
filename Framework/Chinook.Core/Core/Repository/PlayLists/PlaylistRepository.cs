@@ -1,19 +1,18 @@
-﻿using Chinook.Core.Business.Artists;
-using Chinook.Core.Infrastructure.Repositories;
+﻿using Chinook.Core.Infrastructure.Repositories;
 using Chinook.Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace Chinook.Core.Business.PlayLists
+namespace Chinook.Core.Repository.PlayLists
 {
-    public class PlaylistProvider : Repository<Playlist>, IPlaylistProvider
+    public class PlaylistRepository : Repository<Playlist>, IPlaylistRepository
     {
-        public PlaylistProvider(DbContext context) : base(context) { }
+        public PlaylistRepository(DbContext context) : base(context) { }
 
-        public List<Playlist> GetPlaylistsByUserId(Expression<Func<Playlist, bool>> predicate)
+        public async Task<List<Playlist>> GetPlaylistsByUserIdAsync(Expression<Func<Playlist, bool>> predicate)
         {
-            return _dbSet.Where(predicate)
-                    .Include(a => a.Tracks).ThenInclude(a => a.Album).ThenInclude(a => a.Artist).ToList();
+            return await _dbSet.Where(predicate)
+                    .Include(a => a.Tracks).ThenInclude(a => a.Album).ThenInclude(a => a.Artist).ToListAsync();
         }
 
         public Playlist? IncludeTracks(Expression<Func<Playlist, bool>> predicate)

@@ -1,7 +1,7 @@
-﻿using Chinook.Core.Business.Artists;
-using Chinook.Core.Business.PlayLists;
-using Chinook.Core.Business.Tracks;
-using Chinook.Core.Business.UserPlaylists;
+﻿using Chinook.Core.Repository.Artists;
+using Chinook.Core.Repository.PlayLists;
+using Chinook.Core.Repository.Tracks;
+using Chinook.Core.Repository.UserPlaylists;
 using Chinook.Core.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data.Common;
@@ -17,10 +17,10 @@ namespace Chinook.Core.Uow
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public IArtistProvider Artists { get { return new ArtistProvider(this._context); } }
-        public IPlaylistProvider Playlists { get { return new PlaylistProvider(this._context); } }
-        public ITrackProvider Tracks { get { return new TrackProvider(this._context); } }
-        public IUserPlaylistProvider UserPlaylists { get { return new UserPlaylistProvider(this._context); } }
+        public IArtistRepository Artists { get { return new ArtistRepository(this._context); } }
+        public IPlaylistRepository Playlists { get { return new PlaylistRepository(this._context); } }
+        public ITrackRepository Tracks { get { return new TrackRepository(this._context); } }
+        public IUserPlaylistRepository UserPlaylists { get { return new UserPlaylistRepository(this._context); } }
 
         public int Save() => _context.SaveChanges();
 

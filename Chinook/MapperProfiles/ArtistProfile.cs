@@ -2,7 +2,7 @@
 using AutoMapper;
 using Chinook.ClientModels;
 
-namespace Chinook.Profiles
+namespace Chinook.MapperProfiles
 {
     public class ArtistProfile : Profile
     {

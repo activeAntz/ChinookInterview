@@ -1,6 +1,8 @@
 using global::Microsoft.AspNetCore.Components;
 using Chinook.ClientModels;
 using Serilog;
+using Chinook.Utilities.Helper;
+
 
 namespace Chinook.Pages
 {
@@ -11,12 +13,11 @@ namespace Chinook.Pages
 
         private PlaylistDto Playlist = new();
         private List<MessageDto> Message = new();
-        protected override async Task OnInitializedAsync()
+        protected override Task OnParametersSetAsync()
         {
             try
             {
-                await InvokeAsync(StateHasChanged);
-                Playlist = await playListService.GetPlaylistByIdAsync(PlaylistId);
+                return InitialData();
             }
             catch (Exception ex)
             {
@@ -25,18 +26,11 @@ namespace Chinook.Pages
             }
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        private async Task InitialData()
         {
-            try
-            {
-                await OnInitializedAsync();
-                Message = globalErrorService.GetAlertInfo();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message, ex);
-                throw;
-            }
+            await InvokeAsync(StateHasChanged);
+            Playlist = await playListService.GetPlaylistByIdAsync(PlaylistId);
+            Message = globalErrorService.GetAlertInfo();
         }
 
         private void FavoriteTrack(long trackId)
@@ -49,6 +43,8 @@ namespace Chinook.Pages
                     globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} added to playlist Favorites.");
                 else
                     globalErrorService.SetError($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not added to playlist Favorites.");
+
+                InvokeAsync(OnInitializedAsync);
             }
             catch (Exception ex)
             {
@@ -68,6 +64,8 @@ namespace Chinook.Pages
                     globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} removed from playlist {name}.");
                 else
                     globalErrorService.SetError($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not removed from playlist {name}.");
+
+                InvokeAsync(OnInitializedAsync);
             }
             catch (Exception ex)
             {
@@ -86,6 +84,8 @@ namespace Chinook.Pages
                     globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} removed from playlist {name}.");
                 else
                     globalErrorService.SetError($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not removed from playlist {name}.");
+
+                InvokeAsync(OnInitializedAsync);
             }
             catch (Exception ex)
             {

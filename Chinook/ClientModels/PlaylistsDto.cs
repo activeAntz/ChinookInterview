@@ -2,7 +2,7 @@
 {
     public class PlaylistsDto
     {
-        public long PlaylistId { get; set; } = 0;
-        public string Name { get; set; } = string.Empty;
+        public long PlaylistId { get; set; }
+        public string Name { get; set; }
     }
 }

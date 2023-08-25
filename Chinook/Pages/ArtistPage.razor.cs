@@ -3,6 +3,7 @@ using Chinook.Shared.Components;
 using Chinook.ClientModels;
 using Chinook.Utilities.Validation;
 using Serilog;
+using Chinook.Utilities.Helper;
 
 namespace Chinook.Pages;
 public partial class ArtistPage
@@ -19,16 +20,13 @@ public partial class ArtistPage
     private List<MessageDto> Message = new();
     private List<PlaylistsDto> Playlists = new();
 
+    private System.Threading.ManualResetEvent Trigger = new System.Threading.ManualResetEvent(false);
+
     protected override async Task OnInitializedAsync()
     {
         await InvokeAsync(StateHasChanged);
         Artist = artistService.GetArtist(ArtistId);
         Tracks = trackService.GetPlaylistTracksByArtistId(ArtistId);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await OnInitializedAsync();
         Message = globalErrorService.GetAlertInfo();
     }
 
@@ -46,6 +44,8 @@ public partial class ArtistPage
                 globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} added to playlist Favorites.");
             else
                 globalErrorService.SetError($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not added to playlist Favorites.");
+
+            InvokeAsync(OnInitializedAsync);
         }
         catch (Exception ex)
         {
@@ -68,6 +68,8 @@ public partial class ArtistPage
                 globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} removed from playlist Favorites.");
             else
                 globalErrorService.SetInfo($"Track {track.ArtistName} - {track.AlbumTitle} - {track.TrackName} can not removed from playlist Favorites.");
+
+            InvokeAsync(OnInitializedAsync);
         }
         catch (Exception ex)
         {
@@ -97,7 +99,7 @@ public partial class ArtistPage
         }
     }
 
-    private void AddTrackToPlaylist()
+    private async void AddTrackToPlaylist()
     {
         try
         {
@@ -126,6 +128,9 @@ public partial class ArtistPage
                 globalErrorService.SetError($"Track {Artist.Name} - {SelectedTrack.AlbumTitle} - {SelectedTrack.TrackName} can not added to playlist {PlaylistName}.");
 
             PlaylistName = string.Empty;
+
+            eventManager.Invoke();
+
             PlaylistDialog.Close();
         }
         catch (Exception ex)

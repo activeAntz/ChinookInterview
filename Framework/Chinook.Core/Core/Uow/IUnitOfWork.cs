@@ -1,16 +1,16 @@
-﻿using Chinook.Core.Business.Artists;
-using Chinook.Core.Business.PlayLists;
-using Chinook.Core.Business.Tracks;
-using Chinook.Core.Business.UserPlaylists;
+﻿using Chinook.Core.Repository.Artists;
+using Chinook.Core.Repository.PlayLists;
+using Chinook.Core.Repository.Tracks;
+using Chinook.Core.Repository.UserPlaylists;
 
 namespace Chinook.Core.Uow
 {
     public interface IUnitOfWork
     {
-        IArtistProvider Artists { get; }
-        IPlaylistProvider Playlists { get; }
-        ITrackProvider Tracks { get; }
-        IUserPlaylistProvider UserPlaylists { get; }
+        IArtistRepository Artists { get; }
+        IPlaylistRepository Playlists { get; }
+        ITrackRepository Tracks { get; }
+        IUserPlaylistRepository UserPlaylists { get; }
         int Save();
     }
 }

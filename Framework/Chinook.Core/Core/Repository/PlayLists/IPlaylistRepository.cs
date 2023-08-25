@@ -2,11 +2,11 @@
 using System.Linq.Expressions;
 using Chinook.Core.Data.Models;
 
-namespace Chinook.Core.Business.PlayLists
+namespace Chinook.Core.Repository.PlayLists
 {
-    public interface IPlaylistProvider : IRepository<Playlist>
+    public interface IPlaylistRepository : IRepository<Playlist>
     {
-        List<Playlist> GetPlaylistsByUserId(Expression<Func<Playlist, bool>> predicate);
+        Task<List<Playlist>> GetPlaylistsByUserIdAsync(Expression<Func<Playlist, bool>> predicate);
         Playlist? IncludeTracks(Expression<Func<Playlist, bool>> predicate);
         Task<Playlist> ThenIncludeTracks(Expression<Func<Playlist, bool>> predicate);
         Task<List<Playlist>> IncludeTracksWithConditionAsync(Expression<Func<Playlist, bool>> predicate);
